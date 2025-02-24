@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FundCircle | إنشاء جمعية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+  <!-- الهيدر -->
+  <header class="w-full max-w-3xl flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-blue-700">إنشاء جمعية جديدة</h1>
+    <a href="dashboard.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      العودة للجمعيات
+    </a>
+  </header>
+
+  <!-- فورم إنشاء الجمعية -->
+  <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+    <input type="text" id="assocName" placeholder="اسم الجمعية" class="w-full p-2 border rounded mt-2" />
+    <input type="text" id="assocDesc" placeholder="وصف الجمعية" class="w-full p-2 border rounded mt-2" />
+    <input type="number" id="assocAmount" placeholder="المبلغ الكلي" class="w-full p-2 border rounded mt-2" />
+    <input type="number" id="assocLimit" placeholder="عدد الأعضاء" class="w-full p-2 border rounded mt-2" />
+    <button onclick="createAssociation()" class="w-full bg-green-600 text-white py-2 rounded mt-4 hover:bg-green-700">
+      إنشاء الجمعية
+    </button>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("يرجى تسجيل الدخول أولًا!");
+      window.location.href = "index.html";
+    }
+
+    async function createAssociation() {
+      const name = document.getElementById("assocName").value;
+      const description = document.getElementById("assocDesc").value;
+      const totalAmount = document.getElementById("assocAmount").value;
+      const membersLimit = document.getElementById("assocLimit").value;
+
+      try {
+        const res = await fetch("http://localhost:5500/associations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name, description, totalAmount, membersLimit }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ تم إنشاء الجمعية بنجاح!");
+          window.location.href = "dashboard.html";
+        } else {
+          alert(`❌ خطأ: ${data.message}`);
+        }
+      } catch (error) {
+        alert("❌ حدث خطأ أثناء إنشاء الجمعية.");
+      }
+    }
+  </script>
+</body>
+</html>

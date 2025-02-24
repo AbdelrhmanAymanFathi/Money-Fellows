@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FundCircle | تسجيل الدخول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-semibold text-center text-blue-600">مرحبًا بك في FundCircle</h2>
+
+        <!-- فورم تسجيل الدخول -->
+        <div id="loginForm">
+            <h3 class="text-lg font-semibold text-gray-700 text-center mt-4">تسجيل الدخول</h3>
+            <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" class="w-full p-2 border rounded mt-2">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور" class="w-full p-2 border rounded mt-2">
+            <button onclick="login()" class="w-full bg-blue-600 text-white py-2 rounded mt-4 hover:bg-blue-700">
+                تسجيل الدخول
+            </button>
+            <p class="text-center mt-2">ليس لديك حساب؟ 
+                <a href="#" onclick="toggleForms()" class="text-blue-600 font-semibold">أنشئ حسابًا</a>
+            </p>
+        </div>
+
+        <!-- فورم التسجيل -->
+        <div id="registerForm" class="hidden">
+            <h3 class="text-lg font-semibold text-gray-700 text-center mt-4">إنشاء حساب</h3>
+            <input type="text" id="registerName" placeholder="الاسم الكامل" class="w-full p-2 border rounded mt-2">
+            <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" class="w-full p-2 border rounded mt-2">
+            <input type="password" id="registerPassword" placeholder="كلمة المرور" class="w-full p-2 border rounded mt-2">
+            <input type="text" id="registerPhone" placeholder="رقم الهاتف" class="w-full p-2 border rounded mt-2">
+            <button onclick="register()" class="w-full bg-green-600 text-white py-2 rounded mt-4 hover:bg-green-700">
+                إنشاء الحساب
+            </button>
+            <p class="text-center mt-2">لديك حساب بالفعل؟ 
+                <a href="#" onclick="toggleForms()" class="text-blue-600 font-semibold">سجل دخولك</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

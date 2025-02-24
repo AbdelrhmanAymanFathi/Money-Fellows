@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FundCircle | الجمعيات</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-6">
+  <!-- الهيدر -->
+  <header class="w-full max-w-3xl flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-blue-700">الجمعيات المتاحة</h1>
+    <a href="createAssociation.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+      إنشاء جمعية جديدة
+    </a>
+  </header>
+
+  <!-- قائمة الجمعيات -->
+  <div id="associationsList" class="w-full max-w-3xl"></div>
+
+  <script>
+    const API_URL = "http://localhost:5500/associations"; // تأكد من ضبط المسار حسب السيرفر
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      alert("يرجى تسجيل الدخول أولًا!");
+      window.location.href = "index.html";
+    }
+
+    // جلب جميع الجمعيات
+    async function fetchAssociations() {
+      try {
+        const res = await fetch(API_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          renderAssociations(data);
+        } else {
+          alert(`❌ خطأ: ${data.message}`);
+        }
+      } catch (error) {
+        alert("❌ حدث خطأ أثناء جلب البيانات.");
+      }
+    }
+
+    // عرض الجمعيات في الصفحة
+    function renderAssociations(associations) {
+      const list = document.getElementById("associationsList");
+      list.innerHTML = "";
+      associations.forEach((assoc) => {
+        list.innerHTML += `
+          <div class="bg-white p-4 rounded-lg shadow-md mb-4">
+            <h3 class="text-xl font-semibold text-blue-600">${assoc.name}</h3>
+            <p class="text-gray-600">${assoc.description}</p>
+            <p class="text-gray-800 font-bold">💰 ${assoc.totalAmount} جنيه</p>
+            <p class="text-gray-800">👥 الأعضاء: ${assoc.members.length} / ${assoc.membersLimit}</p>
+            <button onclick="joinAssociation('${assoc._id}')" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              الانضمام للجمعية
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    // الانضمام إلى جمعية
+    async function joinAssociation(assocId) {
+      try {
+        const res = await fetch(`${API_URL}/${assocId}/join`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ تم الانضمام بنجاح!");
+          fetchAssociations(); // تحديث القائمة بعد الانضمام
+        } else {
+          alert(`❌ خطأ: ${data.message}`);
+        }
+      } catch (error) {
+        alert("❌ حدث خطأ أثناء الانضمام.");
+      }
+    }
+
+    // تحميل الجمعيات عند فتح الصفحة
+    fetchAssociations();
+  </script>
+</body>
+</html>
