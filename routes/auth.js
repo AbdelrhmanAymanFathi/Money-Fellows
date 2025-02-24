@@ -66,41 +66,34 @@ router.post("/register", async (req, res) => {
 // ✅ Login Route
 router.post("/login", async (req, res) => {
   try {
-    console.log("Received Request Body:", req.body);  // ✅ Debugging
-
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "البريد الإلكتروني وكلمة المرور مطلوبة!" });
-    }
-
-    // ✅ Convert email to lowercase safely
-    const userEmail = email.toLowerCase();
-
-    // ✅ Check if user exists
-    const user = await User.findOne({ email: userEmail });
-    console.log("User found in DB:", user);
-
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(400).json({ message: "البريد الإلكتروني أو كلمة المرور غير صحيحة!" });
     }
 
-    // ✅ Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log("Password Match Result:", isMatch);
-
     if (!isMatch) {
       return res.status(400).json({ message: "البريد الإلكتروني أو كلمة المرور غير صحيحة!" });
     }
 
-    // ✅ Generate Token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // ✅ Include isAdmin in the token payload
+    const token = jwt.sign(
+      { userId: user._id, isAdmin: user.isAdmin },  // Add `isAdmin`
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(200).json({ 
       message: "تم تسجيل الدخول بنجاح!", 
-      token 
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin  // ✅ Send isAdmin in response
+      }
     });
 
   } catch (error) {
@@ -108,6 +101,7 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "حدث خطأ أثناء تسجيل الدخول!", error: error.message });
   }
 });
+
 
 
 // ✅ Get Logged-in User Data
