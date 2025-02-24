@@ -4,40 +4,38 @@ const mongoose = require("mongoose");
 
 const app = express();
 const PORT = 5500; 
-const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fundcircle"; // تأكد من ضبط MONGO_URI
+const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fundcircle"; 
+
 const cors = require("cors");
 
-// Middleware
+// ✅ Middleware (Only Define express.json() Once)
 app.use(express.json());
 app.use(cors());
 
-// connect to MongoDB
+// ✅ Connect to MongoDB
 mongoose
-  .connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(mongoURI, {})
   .then(() => console.log("✅ متصل بقاعدة البيانات بنجاح!"))
   .catch((err) => console.error("❌ فشل الاتصال بقاعدة البيانات:", err));
 
-// Routes
+// ✅ Routes
 app.get("/", (req, res) => {
   res.send("🚀 السيرفر يعمل بنجاح!");
 });
 
 app.use("/auth", require("./routes/auth"));
 app.use("/associations", require("./routes/associations"));
-app.use("/associations", require("./routes/payments")); // ✅ تحميل المدفوعات تحت الجمعيات
+app.use("/associations", require("./routes/payments")); 
 app.use("/admin", require("./routes/admin"));
 
-// طباعة كل المسارات الموجودة في السيرفر
+// ✅ Print All Routes
 app._router.stack.forEach((middleware) => {
   if (middleware.route) {
     console.log(`[ '${middleware.route.path}' ]`);
   }
 });
 
-// Start the server
+// ✅ Start the Server
 app.listen(PORT, () => {
   console.log(`🚀 السيرفر شغال على http://localhost:${PORT}`);
 });
