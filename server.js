@@ -12,10 +12,7 @@ app.use(cors());
 
 // ✅ Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fundcircle", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fundcircle")
   .then(() => console.log("✅ Connected to Database"))
   .catch((err) => console.error("❌ Database Connection Failed:", err));
 
