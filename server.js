@@ -16,6 +16,11 @@ mongoose
   .then(() => console.log("✅ Connected to Database"))
   .catch((err) => console.error("❌ Database Connection Failed:", err));
 
+
+app.get("/", (req, res) => {
+  res.send("Welcome to the server");
+});
+
 // ✅ Routes
 app.use("/auth", require("./routes/auth"));
 app.use("/associations", require("./routes/associations"));
