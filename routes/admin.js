@@ -1,52 +1,37 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
+const { authenticate, adminOnly } = require("../middleware/auth");
 const User = require("../models/User");
 const Association = require("../models/Association");
-require("dotenv").config();
 
 const router = express.Router();
 
-// بيانات تسجيل الدخول للمدير
-const ADMIN_CREDENTIALS = { email: "admin", password: "AdminAdmin" };
-
-// تسجيل دخول المدير
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  console.log("🔍 محاولة تسجيل الدخول:", { email, password });
-
-  if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-    const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET, { expiresIn: "2h" });
-    console.log("✅ تسجيل الدخول ناجح!");
-    return res.status(200).json({ message: "تم تسجيل الدخول بنجاح", token });
-  }
-
-  console.log("❌ تسجيل الدخول فشل!");
-  return res.status(401).json({ message: "❌ بيانات تسجيل الدخول غير صحيحة!" });
+// ✅ Protect admin dashboard
+router.get("/dashboard", authenticate, adminOnly, (req, res) => {
+  res.json({ message: "🚀 مرحبًا بك في لوحة تحكم المسؤول!", adminId: req.user.userId });
 });
 
-// استرجاع جميع المستخدمين (بدون كلمة المرور)
-router.get("/users", async (req, res) => {
+// ✅ Get all users (Admin Only)
+router.get("/users", authenticate, adminOnly, async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: "خطأ في جلب المستخدمين", error });
+    res.status(500).json({ message: "❌ خطأ في جلب المستخدمين", error });
   }
 });
 
-// استرجاع جميع الجمعيات
-router.get("/associations", async (req, res) => {
+// ✅ Get all associations (Admin Only)
+router.get("/associations", authenticate, adminOnly, async (req, res) => {
   try {
     const associations = await Association.find();
     res.status(200).json(associations);
   } catch (error) {
-    res.status(500).json({ message: "خطأ في جلب الجمعيات", error });
+    res.status(500).json({ message: "❌ خطأ في جلب الجمعيات", error });
   }
 });
 
-// إضافة جمعية جديدة
-router.post("/associations", async (req, res) => {
+// ✅ Create a new association (Admin Only)
+router.post("/associations", authenticate, adminOnly, async (req, res) => {
   try {
     const { name, amount } = req.body;
     console.log("📌 بيانات الجمعية الجديدة:", { name, amount });
@@ -58,7 +43,7 @@ router.post("/associations", async (req, res) => {
     res.status(201).json({ message: "تم إضافة الجمعية بنجاح!" });
   } catch (error) {
     console.error("❌ خطأ أثناء إضافة الجمعية:", error);
-    res.status(500).json({ message: "خطأ أثناء إضافة الجمعية", error });
+    res.status(500).json({ message: "❌ خطأ أثناء إضافة الجمعية", error });
   }
 });
 
